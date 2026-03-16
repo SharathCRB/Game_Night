@@ -2,9 +2,19 @@ import streamlit as st
 import base64
 st.markdown("""
 <style>
+
+/* Hide Streamlit menu */
 #MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
+
+/* Hide header */
 header {visibility: hidden;}
+
+/* Hide footer */
+footer {visibility: hidden;}
+
+/* Hide "Hosted with Streamlit" badge */
+[data-testid="stStatusWidget"] {display: none;}
+
 </style>
 """, unsafe_allow_html=True)
 from streamlit_autorefresh import st_autorefresh

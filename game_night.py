@@ -2,7 +2,8 @@ import streamlit as st
 import base64
 import json
 import os
-
+from json import JSONDecodeError
+st.set_option('client.showErrorDetails', False)
 st.markdown("""
 <style>
 [data-testid="stToolbar"] {display: none !important;}
@@ -12,23 +13,65 @@ footer {display: none !important;}
 </style>
 """, unsafe_allow_html=True)
 
+hide_streamlit_style = """
+<style>
+div[data-testid="stToolbar"] {
+    visibility: hidden;
+    height: 0%;
+    position: fixed;
+}
+div[data-testid="stDecoration"] {
+    visibility: hidden;
+    height: 0%;
+    position: fixed;
+}
+div[data-testid="stStatusWidget"] {
+    visibility: hidden;
+    height: 0%;
+    position: fixed;
+}
+#MainMenu {
+    visibility: hidden;
+    height: 0%;
+}
+header {
+    visibility: hidden;
+    height: 0%;
+}
+footer {
+    visibility: hidden;
+    height: 0%;
+}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# Your app content goes here
+st.title("")
+
+
 from streamlit_autorefresh import st_autorefresh
 st_autorefresh(interval=5000, key="refresh")
 
 # ---------- SHARED DATA STORAGE ----------
 DATA_FILE = "data.json"
 
+default_data = {
+    "players": [],
+    "teams": [],
+    "games": [],
+    "game_templates": [],
+    "welcome_text": "Welcome to Game Night!"
+}
+
 if os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "r") as f:
-        data = json.load(f)
+    try:
+        with open(DATA_FILE, "r") as f:
+            data = json.load(f)
+    except JSONDecodeError:
+        data = default_data
 else:
-    data = {
-        "players": [],
-        "teams": [],
-        "games": [],
-        "game_templates": [],
-        "welcome_text": "Welcome to Game Night!"
-    }
+    data = default_data
 
 for key in data:
     st.session_state[key] = data[key]

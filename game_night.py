@@ -3,27 +3,29 @@ import base64
 st.markdown("""
 <style>
 
-/* Hide Streamlit menu */
+/* hide menu */
 #MainMenu {visibility: hidden;}
 
-/* Hide header */
+/* hide header */
 header {visibility: hidden;}
 
-/* Hide footer */
+/* hide footer */
 footer {visibility: hidden;}
 
-/* Hide "Hosted with Streamlit" badge */
-[data-testid="stStatusWidget"] {display: none;}
+/* cover Streamlit branding */
+body::after {
+    content: "";
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: black;  /* match your page background */
+    z-index: 9999;
+}
 
 </style>
 """, unsafe_allow_html=True)
-hide_streamlit_style = """
-            <style>
-            [data-testid="stToolbar"] {visibility: hidden !important;}
-            footer {visibility: hidden !important;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 from streamlit_autorefresh import st_autorefresh
 
 st_autorefresh(interval=5000, key="refresh")

@@ -64,19 +64,21 @@ default_data = {
     "welcome_text": "Welcome to Game Night!"
 }
 
+data = default_data
+
 if os.path.exists(DATA_FILE):
     try:
         with open(DATA_FILE, "r") as f:
             data = json.load(f)
-    except JSONDecodeError:
-        data = default_data
-else:
-    data = default_data
+    except json.JSONDecodeError:
+        # keep previous session data instead of wiping everything
+        data = st.session_state if st.session_state else default_data
 
 for key in data:
     st.session_state[key] = data[key]
 
 def save_data():
+
     data = {
         "players": st.session_state.players,
         "teams": st.session_state.teams,
@@ -84,8 +86,13 @@ def save_data():
         "game_templates": st.session_state.game_templates,
         "welcome_text": st.session_state.welcome_text
     }
-    with open(DATA_FILE, "w") as f:
+
+    temp_file = "data_temp.json"
+
+    with open(temp_file, "w") as f:
         json.dump(data, f)
+
+    os.replace(temp_file, DATA_FILE)
 
 # ---------- ADMIN ACCESS ----------
 admin = False

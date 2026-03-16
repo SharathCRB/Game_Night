@@ -31,8 +31,7 @@ else:
     }
 
 for key in data:
-    if key not in st.session_state:
-        st.session_state[key] = data[key]
+    st.session_state[key] = data[key]
 
 def save_data():
     data = {

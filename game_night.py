@@ -1,5 +1,12 @@
 import streamlit as st
 import base64
+st.markdown("""
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 from streamlit_autorefresh import st_autorefresh
 
 st_autorefresh(interval=5000, key="refresh")

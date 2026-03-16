@@ -1,28 +1,21 @@
 import streamlit as st
 import base64
+import streamlit as st
+
 st.markdown("""
 <style>
 
-/* hide menu */
-#MainMenu {visibility: hidden;}
+/* hide streamlit toolbar */
+[data-testid="stToolbar"] {display: none !important;}
 
 /* hide header */
-header {visibility: hidden;}
+header {display: none !important;}
 
 /* hide footer */
-footer {visibility: hidden;}
+footer {display: none !important;}
 
-/* cover Streamlit branding */
-body::after {
-    content: "";
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 80px;
-    background: black;  /* match your page background */
-    z-index: 9999;
-}
+/* hide the entire bottom status/branding area */
+[data-testid="stStatusWidget"] {display: none !important;}
 
 </style>
 """, unsafe_allow_html=True)

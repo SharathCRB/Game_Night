@@ -1,31 +1,52 @@
 import streamlit as st
 import base64
-import streamlit as st
+import json
+import os
 
 st.markdown("""
 <style>
-
-/* hide streamlit toolbar */
 [data-testid="stToolbar"] {display: none !important;}
-
-/* hide header */
 header {display: none !important;}
-
-/* hide footer */
 footer {display: none !important;}
-
-/* hide the entire bottom status/branding area */
 [data-testid="stStatusWidget"] {display: none !important;}
-
 </style>
 """, unsafe_allow_html=True)
-from streamlit_autorefresh import st_autorefresh
 
+from streamlit_autorefresh import st_autorefresh
 st_autorefresh(interval=5000, key="refresh")
 
-# ---------- HIDDEN ADMIN ACCESS ----------
-admin = False
+# ---------- SHARED DATA STORAGE ----------
+DATA_FILE = "data.json"
 
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r") as f:
+        data = json.load(f)
+else:
+    data = {
+        "players": [],
+        "teams": [],
+        "games": [],
+        "game_templates": [],
+        "welcome_text": "Welcome to Game Night!"
+    }
+
+for key in data:
+    if key not in st.session_state:
+        st.session_state[key] = data[key]
+
+def save_data():
+    data = {
+        "players": st.session_state.players,
+        "teams": st.session_state.teams,
+        "games": st.session_state.games,
+        "game_templates": st.session_state.game_templates,
+        "welcome_text": st.session_state.welcome_text
+    }
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+# ---------- ADMIN ACCESS ----------
+admin = False
 secret_access = st.text_input("", placeholder="")
 
 if secret_access == "admin":
@@ -33,27 +54,8 @@ if secret_access == "admin":
     if admin_password == "1234":
         admin = True
 
-
 # ---------- PAGE LAYOUT ----------
 main_col, side_col = st.columns([3,1])
-
-
-# ---------- SESSION STORAGE ----------
-if "players" not in st.session_state:
-    st.session_state.players = []
-
-if "teams" not in st.session_state:
-    st.session_state.teams = []
-
-if "games" not in st.session_state:
-    st.session_state.games = []
-
-if "game_templates" not in st.session_state:
-    st.session_state.game_templates = []
-
-if "welcome_text" not in st.session_state:
-    st.session_state.welcome_text = "Welcome to Game Night!"
-
 
 # ---------- MAIN COLUMN ----------
 with main_col:
@@ -65,10 +67,10 @@ with main_col:
             "Edit Welcome Message",
             st.session_state.welcome_text
         )
+        save_data()
 
     st.markdown(f"## {st.session_state.welcome_text}")
     st.markdown("---")
-
 
     # ---------- ADD PLAYER ----------
     if admin:
@@ -85,13 +87,15 @@ with main_col:
 
             if player_name and player_photo:
 
+                img_base64 = base64.b64encode(player_photo.read()).decode()
+
                 st.session_state.players.append({
                     "name": player_name,
-                    "photo": player_photo
+                    "photo": img_base64
                 })
 
+                save_data()
                 st.success(f"{player_name} added!")
-
 
     # ---------- PLAYER LIST ----------
     st.header("Players")
@@ -101,13 +105,12 @@ with main_col:
         col1, col2 = st.columns([1,3])
 
         with col1:
-            st.image(player["photo"], width=80)
+            st.image(base64.b64decode(player["photo"]), width=80)
 
         with col2:
             st.write(player["name"])
 
     st.markdown("---")
-
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]
@@ -131,21 +134,23 @@ with main_col:
 
             if team_name and team_photo and team_members:
 
+                img_base64 = base64.b64encode(team_photo.read()).decode()
+
                 st.session_state.teams.append({
                     "name": team_name,
                     "members": team_members,
-                    "photo": team_photo
+                    "photo": img_base64
                 })
 
+                save_data()
                 st.success(f"{team_name} created!")
-
 
     # ---------- TEAM DISPLAY ----------
     st.header("Teams")
 
     for team in st.session_state.teams:
 
-        st.image(team["photo"], width=200)
+        st.image(base64.b64decode(team["photo"]), width=200)
         st.subheader(team["name"])
 
         cols = st.columns(3)
@@ -187,47 +192,45 @@ if admin:
             "color": template_color
         })
 
+        save_data()
         st.success("Template saved!")
 
+# ---------- ADD GAME FROM TEMPLATE ----------
+if admin and st.session_state.game_templates:
 
+    st.header("Add Game From Template")
 
+    template_names = [t["name"] for t in st.session_state.game_templates]
 
-    # ---------- ADD GAME FROM TEMPLATE ----------
-    if admin and st.session_state.game_templates:
+    selected_template = st.selectbox(
+        "Choose Template",
+        template_names
+    )
 
-        st.header("Add Game From Template")
+    if st.button("Add Game To Event"):
 
-        template_names = [t["name"] for t in st.session_state.game_templates]
-
-        selected_template = st.selectbox(
-            "Choose Template",
-            template_names
+        template = next(
+            t for t in st.session_state.game_templates
+            if t["name"] == selected_template
         )
 
-        if st.button("Add Game To Event"):
+        st.session_state.games.append({
+            "name": template["name"],
+            "color": template["color"],
+            "background": template["background"],
+            "rounds": template["rounds"],
+            "points": template["points"],
+            "round_winners": ["" for _ in range(template["rounds"])]
+        })
 
-            template = next(
-                t for t in st.session_state.game_templates
-                if t["name"] == selected_template
-            )
-
-            st.session_state.games.append({
-                "name": template["name"],
-                "color": template["color"],
-                "background": template["background"],
-                "rounds": template["rounds"],
-                "points": template["points"],
-                "round_winners": ["" for _ in range(template["rounds"])]
-            })
-
-            st.success(f"{template['name']} added to event!")
+        save_data()
+        st.success(f"{template['name']} added to event!")
 
 # ---------- DISPLAY GAMES ----------
 for idx, game in enumerate(st.session_state.games):
 
     rounds_html = ""
 
-    # ---------- ROUNDS ----------
     for r in range(game["rounds"]):
 
         if admin:
@@ -237,16 +240,13 @@ for idx, game in enumerate(st.session_state.games):
                 key=f"round_{idx}_{r}"
             )
             game["round_winners"][r] = winner
+            save_data()
 
         winner = game["round_winners"][r]
-
         rounds_html += f"<p><b>Round {r+1} Winner:</b> {winner}</p>"
 
-
-    # ---------- CALCULATE GAME WINNER ----------
     game_winner = "TBD"
 
-    # only calculate winner if ALL rounds have winners
     if "" not in game["round_winners"]:
 
         team_scores = {}
@@ -256,25 +256,18 @@ for idx, game in enumerate(st.session_state.games):
 
         max_score = max(team_scores.values())
 
-        winners = [
-            t for t, s in team_scores.items()
-            if s == max_score
-        ]
+        winners = [t for t, s in team_scores.items() if s == max_score]
 
         if len(winners) == 1:
             game_winner = winners[0]
         else:
             game_winner = "Tie"
 
-
-    # ---------- BACKGROUND STYLE ----------
     if game.get("background"):
         style = f"background:linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)),url(data:image/jpg;base64,{game['background']});background-size:cover;background-position:center;"
     else:
         style = "background:#111;"
 
-
-    # ---------- GAME CARD ----------
     st.markdown(
         f"""
 <div style="{style} padding:40px;border-radius:15px;color:white;max-width:900px;margin:auto;margin-bottom:25px;box-shadow:0px 8px 25px rgba(0,0,0,0.4);">
@@ -301,31 +294,20 @@ Points: {game['points']}
 # ---------- LEADERBOARD ----------
 with st.expander("Leaderboard"):
 
-    scores = {
-        team["name"]: 0
-        for team in st.session_state.teams
-    }
+    scores = {team["name"]: 0 for team in st.session_state.teams}
 
     for game in st.session_state.games:
 
         if game["rounds"] == 0:
             continue
 
-        # points per round
         round_points = game["points"] / game["rounds"]
 
         for winner in game["round_winners"]:
-
             if winner:
                 scores[winner] += round_points
 
-
-    # sort leaderboard
-    sorted_scores = sorted(
-        scores.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
     for team, score in sorted_scores:
         st.write(f"{team} — {round(score,2)} points")

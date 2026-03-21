@@ -93,7 +93,50 @@ def save_data():
         json.dump(data, f)
 
     os.replace(temp_file, DATA_FILE)
+def zoomable_image(img_base64, size=80, uid="img"):
 
+    st.markdown(f"""
+    <style>
+    .zoom-img-{uid} {{
+        width:{size}px;
+        border-radius:10px;
+        cursor:pointer;
+    }}
+
+    .overlay-{uid} {{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.95);
+        display:none;
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+    }}
+
+    .overlay-{uid} img {{
+        max-width:95%;
+        max-height:95%;
+        border-radius:10px;
+    }}
+
+    .overlay-{uid}:target {{
+        display:flex;
+    }}
+    </style>
+
+    <a href="#{uid}">
+        <img src="data:image/png;base64,{img_base64}" class="zoom-img-{uid}">
+    </a>
+
+    <div id="{uid}" class="overlay-{uid}">
+        <a href="#">
+            <img src="data:image/png;base64,{img_base64}">
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
 # ---------- ADMIN ACCESS ----------
 admin = False
 secret_access = st.text_input("", placeholder="")
@@ -149,12 +192,13 @@ with main_col:
     # ---------- PLAYER LIST ----------
     st.header("Players")
 
-    for player in st.session_state.players:
+    for idx, player in enumerate(st.session_state.players):
 
         col1, col2 = st.columns([1,3])
 
         with col1:
-            st.image(base64.b64decode(player["photo"]), width=80)
+            with col1:
+                zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
 
         with col2:
             st.write(player["name"])
@@ -199,7 +243,7 @@ with main_col:
 
     for team in st.session_state.teams:
 
-        st.image(base64.b64decode(team["photo"]), width=200)
+        zoomable_image(team["photo"], size=150, uid=f"team_{team['name']}")
         st.subheader(team["name"])
 
         cols = st.columns(3)

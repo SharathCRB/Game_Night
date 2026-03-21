@@ -487,7 +487,6 @@ display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
-pointer-events:none;
 }}
 
 .title-text {{
@@ -549,7 +548,7 @@ NEXT GAME IS
 
 <img src="data:image/jpg;base64,{final_img}" class="final-img">
 
-<audio autoplay muted>
+<audio autoplay>
 <source src="https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverwritten_Role_Playing_Game.mp3">
 </audio>
 
@@ -558,7 +557,7 @@ NEXT GAME IS
 <script>
 setTimeout(() => {{
 document.body.innerHTML = "";
-}}, 7500);
+}}, 12000);
 </script>
 
 """,

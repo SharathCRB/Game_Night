@@ -214,47 +214,30 @@ with main_col:
     # ---------- PLAYER LIST ----------
     with st.expander("Players"):
 
-        st.markdown(
-            """
-            <style>
-            .player-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-                text-align: center;
-            }
+        players = st.session_state.players
 
-            .player-card img {
-                width: 90px;
-                border-radius: 10px;
-            }
+        for i in range(0, len(players), 3):
 
-            .player-name {
-                font-size: 14px;
-                margin-top: 4px;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+            cols = st.columns(3)
 
-        html = '<div class="player-grid">'
+            for j in range(3):
 
-        for i, player in enumerate(st.session_state.players):
+                if i + j < len(players):
 
-            img = player["photo"]
-            name = player["name"]
+                    player = players[i + j]
 
-            html += f"""
-            <div class="player-card">
-                <img src="data:image/png;base64,{img}">
-                <div class="player-name">{name}</div>
-            </div>
-            """
+                    with cols[j]:
 
-        html += "</div>"
+                        zoomable_image(
+                            player["photo"],
+                            size=90,
+                            uid=f"player_{i+j}"
+                        )
 
-    st.markdown(html, unsafe_allow_html=True)
+                        st.markdown(
+                            f"<p style='text-align:center'>{player['name']}</p>",
+                            unsafe_allow_html=True
+                        )
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]
 

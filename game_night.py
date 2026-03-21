@@ -67,10 +67,11 @@ st.markdown("""
     .player-row div[data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
         align-items: center;
+        justify-content: flex-start !important; /* 👈 THIS fixes right shift */
     }
 
     .player-row div[data-testid="column"] {
-        flex: unset !important;
+        flex: 0 0 auto !important;  /* 👈 prevents stretching */
         width: auto !important;
     }
 }

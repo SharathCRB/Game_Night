@@ -51,7 +51,7 @@ st.title("")
 
 
 from streamlit_autorefresh import st_autorefresh
-st_autorefresh(interval=5000, key="refresh")
+st_autorefresh(interval=10000, key="refresh")
 
 # ---------- SHARED DATA STORAGE ----------
 DATA_FILE = "data.json"
@@ -75,6 +75,10 @@ if os.path.exists(DATA_FILE):
 
 for key in data:
     st.session_state[key] = data[key]
+    if "play_transition" not in st.session_state:
+        st.session_state.play_transition = False
+    if "last_game_bg" not in st.session_state:
+        st.session_state.last_game_bg = None
 
 def save_data():
 
@@ -191,6 +195,13 @@ with main_col:
     # ---------- PLAYER LIST ----------
     with st.expander("Players"):
 
+        sorted_players = sorted(
+            st.session_state.players,
+            key=lambda p: p["name"].lower()
+        )
+
+    for idx, player in enumerate(sorted_players):
+
         for idx, player in enumerate(st.session_state.players):
 
             col1, col2, col3 = st.columns([1,3,1])
@@ -211,7 +222,10 @@ with main_col:
                             save_data()
 
     # ---------- CREATE TEAM ----------
-    player_names = [p["name"] for p in st.session_state.players]
+    player_names = sorted(
+        [p["name"] for p in st.session_state.players],
+        key=lambda x: x.lower()
+    )
 
     if admin:
 
@@ -265,7 +279,8 @@ with main_col:
 
         cols = st.columns(3)
 
-        for i, member in enumerate(team["members"]):
+        sorted_members = sorted(team["members"], key=lambda x: x.lower())
+        for i, member in enumerate(sorted_members):
             cols[i % 3].write(member)
 
         st.markdown("---")
@@ -332,6 +347,8 @@ if admin and st.session_state.game_templates:
             "points": template["points"],
             "round_winners": ["" for _ in range(template["rounds"])]
         })
+        st.session_state.play_transition = True
+        st.session_state.last_game_bg = template["background"]
 
         save_data()
         st.success(f"{template['name']} added to event!")
@@ -445,3 +462,92 @@ with st.expander("Leaderboard"):
 
         with col2:
             st.write(f"{team_name} — {round(score,2)} points")
+# ---------- ANIMATION ----------
+if st.session_state.play_transition:
+
+    images = [
+        t["background"]
+        for t in st.session_state.game_templates
+        if t.get("background")
+    ]
+
+    imgs_html = ""
+
+    for img in images:
+        imgs_html += f'<img src="data:image/jpg;base64,{img}" class="slide-img">'
+
+    final_img = st.session_state.last_game_bg or ""
+
+    st.markdown(
+        f"""
+<style>
+
+.transition-overlay {{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+z-index:99999;
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+}}
+
+.slider {{
+display:flex;
+gap:40px;
+animation: slide 5s linear forwards;
+}}
+
+.slide-img {{
+height:200px;
+border-radius:20px;
+}}
+
+@keyframes slide {{
+0% {{ transform: translateX(100%); }}
+100% {{ transform: translateX(-100%); }}
+}}
+
+.final-img {{
+position:absolute;
+height:300px;
+animation: zoomout 2s 5s forwards;
+}}
+
+@keyframes zoomout {{
+0% {{ transform: scale(1); }}
+100% {{ transform: scale(0.2); opacity:0; }}
+}}
+
+</style>
+
+<div class="transition-overlay">
+
+<div class="slider">
+{imgs_html}
+</div>
+
+<img src="data:image/jpg;base64,{final_img}" class="final-img">
+
+<audio autoplay>
+<source src="https://www.soundjay.com/buttons/sounds/button-09.mp3">
+</audio>
+
+</div>
+
+<script>
+setTimeout(() => {{
+window.location.reload();
+}}, 7000);
+</script>
+
+""",
+        unsafe_allow_html=True
+    )
+
+    st.session_state.play_transition = False

@@ -51,7 +51,8 @@ st.title("")
 
 
 from streamlit_autorefresh import st_autorefresh
-st_autorefresh(interval=10000, key="refresh")
+if not st.session_state.get("play_transition", False):
+    st_autorefresh(interval=10000, key="refresh")
 
 # ---------- SHARED DATA STORAGE ----------
 DATA_FILE = "data.json"

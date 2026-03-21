@@ -75,10 +75,10 @@ if os.path.exists(DATA_FILE):
 
 for key in data:
     st.session_state[key] = data[key]
-    if "play_transition" not in st.session_state:
-        st.session_state.play_transition = False
-    if "last_game_bg" not in st.session_state:
-        st.session_state.last_game_bg = None
+if "play_transition" not in st.session_state:
+    st.session_state.play_transition = False
+if "last_game_bg" not in st.session_state:
+    st.session_state.last_game_bg = None
 
 def save_data():
 
@@ -216,43 +216,43 @@ with st.expander("Players"):
                     st.session_state.players.pop(idx)
                     save_data()
 
-    # ---------- CREATE TEAM ----------
-    player_names = sorted(
-        [p["name"] for p in st.session_state.players],
-        key=lambda x: x.lower()
+# ---------- CREATE TEAM ----------
+player_names = sorted(
+    [p["name"] for p in st.session_state.players],
+    key=lambda x: x.lower()
+)
+
+if admin:
+
+    st.header("Create Team")
+
+    team_name = st.text_input("Team Name")
+    team_photo = st.file_uploader(
+        "Upload Team Photo",
+        type=["png","jpg","jpeg"]
     )
 
-    if admin:
+    team_members = st.multiselect(
+        "Select Players",
+        player_names
+    )
 
-        st.header("Create Team")
+    if st.button("Create Team"):
 
-        team_name = st.text_input("Team Name")
-        team_photo = st.file_uploader(
-            "Upload Team Photo",
-            type=["png","jpg","jpeg"]
-        )
+        if team_name and team_photo and team_members:
 
-        team_members = st.multiselect(
-            "Select Players",
-            player_names
-        )
+            img_base64 = base64.b64encode(team_photo.read()).decode()
 
-        if st.button("Create Team"):
+            st.session_state.teams.append({
+                "name": team_name,
+                "members": team_members,
+                "photo": img_base64
+            })
 
-            if team_name and team_photo and team_members:
+            save_data()
+            st.success(f"{team_name} created!")
 
-                img_base64 = base64.b64encode(team_photo.read()).decode()
-
-                st.session_state.teams.append({
-                    "name": team_name,
-                    "members": team_members,
-                    "photo": img_base64
-                })
-
-                save_data()
-                st.success(f"{team_name} created!")
-
-    # ---------- TEAM DISPLAY ----------
+# ---------- TEAM DISPLAY ----------
     st.header("Teams")
 
     for idx, team in enumerate(st.session_state.teams):
@@ -268,9 +268,6 @@ with st.expander("Players"):
                 if st.button("❌", key=f"del_team_{idx}"):
                     st.session_state.teams.pop(idx)
                     save_data()
-                    if st.button("❌", key=f"del_team_{idx}"):
-                        st.session_state.teams.pop(idx)
-                        save_data()
 
         cols = st.columns(3)
 

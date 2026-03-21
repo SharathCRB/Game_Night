@@ -65,21 +65,24 @@ st.markdown("""
 <style>
 @media (max-width: 768px) {
 
-    /* Fix horizontal scroll issue */
-    section.main > div {
-        max-width: 100% !important;
-        overflow-x: hidden !important;
-    }
-
-    /* Fix columns behavior */
     .player-row div[data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
         align-items: center !important;
     }
 
     .player-row div[data-testid="column"] {
-        min-width: 0 !important;   /* 👈 KEY FIX */
-        flex: 1 1 0% !important;   /* 👈 prevents overflow */
+        min-width: 0 !important;
+    }
+
+    /* 👇 THIS is the real fix */
+    .player-row div[data-testid="column"]:nth-child(2) {
+        overflow: hidden !important;
+    }
+
+    .player-row p {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        margin: 0 !important;
     }
 
 }

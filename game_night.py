@@ -51,8 +51,7 @@ st.title("")
 
 
 from streamlit_autorefresh import st_autorefresh
-if not st.session_state.get("play_transition", False):
-    st_autorefresh(interval=10000, key="refresh")
+st_autorefresh(interval=10000, key="refresh")
 
 # ---------- SHARED DATA STORAGE ----------
 DATA_FILE = "data.json"
@@ -550,14 +549,14 @@ NEXT GAME IS
 <img src="data:image/jpg;base64,{final_img}" class="final-img">
 
 <audio autoplay>
-<source src="https://www.soundjay.com/buttons/sounds/button-09.mp3">
+<source src="https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverwritten_Role_Playing_Game.mp3">
 </audio>
 
 </div>
 
 <script>
 setTimeout(() => {{
-window.location.reload();
+document.body.innerHTML = "";
 }}, 7500);
 </script>
 

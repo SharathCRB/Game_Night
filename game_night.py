@@ -45,13 +45,44 @@ footer {
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+st.markdown("""
+<style>
+/* Force player rows to stay horizontal on mobile */
+@media (max-width: 768px) {
+    div[data-testid="column"] {
+        flex: unset !important;
+        width: auto !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important;
+        align-items: center;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+st.markdown("""
+<style>
+@media (max-width: 768px) {
+    .player-row div[data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important;
+        align-items: center;
+    }
+
+    .player-row div[data-testid="column"] {
+        flex: unset !important;
+        width: auto !important;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Your app content goes here
 st.title("")
 
 
 from streamlit_autorefresh import st_autorefresh
-st_autorefresh(interval=5000, key="refresh")
+st_autorefresh(interval=10000, key="refresh")
 
 # ---------- SHARED DATA STORAGE ----------
 DATA_FILE = "data.json"
@@ -191,19 +222,16 @@ with main_col:
 
     # ---------- PLAYER LIST ----------
     st.header("Players")
-
+    
     for idx, player in enumerate(st.session_state.players):
-
+        
+        st.markdown('<div class="player-row">', unsafe_allow_html=True)
         col1, col2 = st.columns([1,3])
-
         with col1:
-            with col1:
-                zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
-
+            zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
         with col2:
             st.write(player["name"])
-
-    st.markdown("---")
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]

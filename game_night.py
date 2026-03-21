@@ -47,24 +47,8 @@ footer {
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.markdown("""
 <style>
-/* Force player rows to stay horizontal on mobile */
-@media (max-width: 768px) {
-    div[data-testid="column"] {
-        flex: unset !important;
-        width: auto !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] {
-        flex-wrap: nowrap !important;
-        align-items: center;
-    }
-}
-</style>
-""", unsafe_allow_html=True)
-st.markdown("""
-<style>
-[data-testid="column"] {
-    min-width: 0 !important;
+body {
+    overflow-x: hidden;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -74,7 +58,7 @@ st.title("")
 
 
 from streamlit_autorefresh import st_autorefresh
-st_autorefresh(interval=10000, key="refresh")
+st_autorefresh(interval=5000, key="refresh")
 
 # ---------- SHARED DATA STORAGE ----------
 DATA_FILE = "data.json"
@@ -121,9 +105,7 @@ def zoomable_image(img_base64, size=80, uid="img"):
     st.markdown(f"""
     <style>
     .zoom-img-{uid} {{
-        width:100%;
-        max-width:{size}px;
-        height:auto;
+        width:{size}px;
         border-radius:10px;
         cursor:pointer;
     }}
@@ -216,19 +198,21 @@ with main_col:
 
     # ---------- PLAYER LIST ----------
     st.header("Players")
-    
+
     for idx, player in enumerate(st.session_state.players):
-        
-        st.markdown('<div class="player-row">', unsafe_allow_html=True)
-        col1, col2 = st.columns([1,3])
+        col1, col2 = st.columns([1,5])
         with col1:
             zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
+
         with col2:
             st.markdown(
-                f"<div style='word-break: break-all;'>{player['name']}</div>",
+                f"<div style='text-align:left; font-size:18px; margin-top:20px;'>"
+                f"{player['name']}"
+                f"</div>",
                 unsafe_allow_html=True
             )
-        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("---")
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]

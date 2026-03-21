@@ -61,33 +61,6 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-st.markdown("""
-<style>
-@media (max-width: 768px) {
-
-    .player-row div[data-testid="stHorizontalBlock"] {
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-    }
-
-    .player-row div[data-testid="column"] {
-        min-width: 0 !important;
-    }
-
-    /* 👇 THIS is the real fix */
-    .player-row div[data-testid="column"]:nth-child(2) {
-        overflow: hidden !important;
-    }
-
-    .player-row p {
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-        margin: 0 !important;
-    }
-
-}
-</style>
-""", unsafe_allow_html=True)
 
 # Your app content goes here
 st.title("")
@@ -237,42 +210,12 @@ with main_col:
     
     for idx, player in enumerate(st.session_state.players):
         
-        st.markdown(f"""
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-            <div>
-                <a href="#player_{idx}">
-                    <img src="data:image/png;base64,{player['photo']}" 
-                         style="width:70px; height:70px; border-radius:10px; object-fit:cover; cursor:pointer;">
-                </a>
-            </div>
-
-            <div style="font-size:16px;">
-                {player['name']}
-            </div>
-        </div>
-
-        <div id="player_{idx}" style="
-            position:fixed;
-            top:0; left:0;
-            width:100%; height:100%;
-            background:rgba(0,0,0,0.95);
-            display:none;
-            justify-content:center;
-            align-items:center;
-            z-index:9999;
-        ">
-            <a href="#">
-                <img src="data:image/png;base64,{player['photo']}" 
-                     style="max-width:95%; max-height:95%; border-radius:10px;">
-            </a>
-        </div>
-
-        <style>
-        #player_{idx}:target {{
-            display:flex;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
+        st.markdown('<div class="player-row">', unsafe_allow_html=True)
+        col1, col2 = st.columns([1,3])
+        with col1:
+            zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
+        with col2:
+            st.write(player["name"])
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ---------- CREATE TEAM ----------

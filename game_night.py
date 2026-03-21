@@ -61,6 +61,13 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
+st.markdown("""
+<style>
+[data-testid="column"] {
+    min-width: 0 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Your app content goes here
 st.title("")
@@ -114,7 +121,9 @@ def zoomable_image(img_base64, size=80, uid="img"):
     st.markdown(f"""
     <style>
     .zoom-img-{uid} {{
-        width:{size}px;
+        width:100%;
+        max-width:{size}px;
+        height:auto;
         border-radius:10px;
         cursor:pointer;
     }}

@@ -70,9 +70,8 @@ if os.path.exists(DATA_FILE):
     try:
         with open(DATA_FILE, "r") as f:
             data = json.load(f)
-    except json.JSONDecodeError:
-        # keep previous session data instead of wiping everything
-        data = st.session_state if st.session_state else default_data
+    except JSONDecodeError:
+        data = default_data
 
 for key in data:
     st.session_state[key] = data[key]
@@ -194,13 +193,20 @@ with main_col:
 
         for idx, player in enumerate(st.session_state.players):
 
-            col1, col2 = st.columns([1,3])
+            col1, col2, col3 = st.columns([1,3,1])
 
             with col1:
                 zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
 
             with col2:
                 st.write(player["name"])
+
+            if admin:
+                with col3:
+                    if st.button("❌", key=f"del_player_{idx}"):
+                        st.session_state.players.pop(idx)
+                        save_data()
+                        st.rerun()
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]
@@ -238,10 +244,20 @@ with main_col:
     # ---------- TEAM DISPLAY ----------
     st.header("Teams")
 
-    for team in st.session_state.teams:
+    for idx, team in enumerate(st.session_state.teams):
 
-        zoomable_image(team["photo"], size=150, uid=f"team_{team['name']}")
-        st.subheader(team["name"])
+        colA, colB = st.columns([5,1])
+
+        with colA:
+            zoomable_image(team["photo"], size=150, uid=f"team_{team['name']}")
+            st.subheader(team["name"])
+
+        if admin:
+            with colB:
+                if st.button("❌", key=f"del_team_{idx}"):
+                    st.session_state.teams.pop(idx)
+                    save_data()
+                    st.rerun()
 
         cols = st.columns(3)
 
@@ -319,6 +335,12 @@ if admin and st.session_state.game_templates:
 # ---------- DISPLAY GAMES ----------
 for idx, game in enumerate(st.session_state.games):
 
+    if admin:
+        if st.button(f"Delete {game['name']}", key=f"del_game_{idx}"):
+            st.session_state.games.pop(idx)
+            save_data()
+            st.rerun()
+
     rounds_html = ""
 
     for r in range(game["rounds"]):
@@ -329,8 +351,11 @@ for idx, game in enumerate(st.session_state.games):
                 [""] + [team["name"] for team in st.session_state.teams],
                 key=f"round_{idx}_{r}"
             )
-            game["round_winners"][r] = winner
-            save_data()
+
+            # FIX: only save if changed
+            if game["round_winners"][r] != winner:
+                game["round_winners"][r] = winner
+                save_data()
 
         winner = game["round_winners"][r]
         rounds_html += f"<p><b>Round {r+1} Winner:</b> {winner}</p>"
@@ -399,5 +424,21 @@ with st.expander("Leaderboard"):
 
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
-    for team, score in sorted_scores:
-        st.write(f"{team} — {round(score,2)} points")
+    for idx, (team_name, score) in enumerate(sorted_scores):
+
+        team_data = next(
+            t for t in st.session_state.teams
+            if t["name"] == team_name
+        )
+
+        col1, col2 = st.columns([1,4])
+
+        with col1:
+            zoomable_image(
+                team_data["photo"],
+                size=60,
+                uid=f"leader_{idx}"
+            )
+
+        with col2:
+            st.write(f"{team_name} — {round(score,2)} points")

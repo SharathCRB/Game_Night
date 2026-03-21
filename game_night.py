@@ -206,7 +206,7 @@ with main_col:
                     if st.button("❌", key=f"del_player_{idx}"):
                         st.session_state.players.pop(idx)
                         save_data()
-                        st.rerun()
+                        st.experimental_rerun()
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]
@@ -257,7 +257,7 @@ with main_col:
                 if st.button("❌", key=f"del_team_{idx}"):
                     st.session_state.teams.pop(idx)
                     save_data()
-                    st.rerun()
+                    st.experimental_rerun()
 
         cols = st.columns(3)
 
@@ -339,7 +339,7 @@ for idx, game in enumerate(st.session_state.games):
         if st.button(f"Delete {game['name']}", key=f"del_game_{idx}"):
             st.session_state.games.pop(idx)
             save_data()
-            st.rerun()
+            st.experimental_rerun()
 
     rounds_html = ""
 

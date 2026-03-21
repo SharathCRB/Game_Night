@@ -192,34 +192,29 @@ with main_col:
                 save_data()
                 st.success(f"{player_name} added!")
 
-    # ---------- PLAYER LIST ----------
-    with st.expander("Players"):
+# ---------- PLAYER LIST ----------
+with st.expander("Players"):
 
-        sorted_players = sorted(
-            st.session_state.players,
-            key=lambda p: p["name"].lower()
-        )
+    sorted_players = sorted(
+        list(enumerate(st.session_state.players)),
+        key=lambda x: x[1]["name"].lower()
+    )
 
-    for idx, player in enumerate(sorted_players):
+    for idx, player in sorted_players:
 
-        for idx, player in enumerate(st.session_state.players):
+        col1, col2, col3 = st.columns([1,3,1])
 
-            col1, col2, col3 = st.columns([1,3,1])
+        with col1:
+            zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
 
-            with col1:
-                zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
+        with col2:
+            st.write(player["name"])
 
-            with col2:
-                st.write(player["name"])
-
-            if admin:
-                with col3:
-                    if st.button("❌", key=f"del_player_{idx}"):
-                        st.session_state.players.pop(idx)
-                        save_data()
-                        if st.button("❌", key=f"del_player_{idx}"):
-                            st.session_state.players.pop(idx)
-                            save_data()
+        if admin:
+            with col3:
+                if st.button("❌", key=f"del_player_{idx}"):
+                    st.session_state.players.pop(idx)
+                    save_data()
 
     # ---------- CREATE TEAM ----------
     player_names = sorted(
@@ -486,8 +481,8 @@ if st.session_state.play_transition:
 position:fixed;
 top:0;
 left:0;
-width:100%;
-height:100%;
+width:100vw;
+height:100vh;
 background:black;
 z-index:99999;
 overflow:hidden;
@@ -495,6 +490,13 @@ display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
+}}
+
+.title-text {{
+color:white;
+font-size:40px;
+margin-bottom:20px;
+animation: fadein 1s;
 }}
 
 .slider {{
@@ -516,7 +518,13 @@ border-radius:20px;
 .final-img {{
 position:absolute;
 height:300px;
-animation: zoomout 2s 5s forwards;
+opacity:0;
+animation: showfinal 1s 5s forwards, zoomout 2s 6s forwards;
+}}
+
+@keyframes showfinal {{
+0% {{ opacity:0; }}
+100% {{ opacity:1; }}
 }}
 
 @keyframes zoomout {{
@@ -524,9 +532,18 @@ animation: zoomout 2s 5s forwards;
 100% {{ transform: scale(0.2); opacity:0; }}
 }}
 
+@keyframes fadein {{
+0% {{ opacity:0; }}
+100% {{ opacity:1; }}
+}}
+
 </style>
 
 <div class="transition-overlay">
+
+<div class="title-text">
+NEXT GAME IS
+</div>
 
 <div class="slider">
 {imgs_html}
@@ -543,7 +560,7 @@ animation: zoomout 2s 5s forwards;
 <script>
 setTimeout(() => {{
 window.location.reload();
-}}, 7000);
+}}, 7500);
 </script>
 
 """,

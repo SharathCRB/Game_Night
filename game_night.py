@@ -47,11 +47,26 @@ footer {
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.markdown("""
 <style>
-body {
-    overflow-x: hidden;
+
+/* remove top padding */
+.block-container {
+    padding-top: 0rem !important;
 }
+
+/* remove space above */
+section.main > div {
+    padding-top: 0rem !important;
+}
+
+/* remove mobile gap */
+div[data-testid="stAppViewContainer"] {
+    padding-top: 0rem !important;
+    margin-top: 0rem !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # Your app content goes here
 st.title("")
@@ -197,20 +212,18 @@ with main_col:
                 st.success(f"{player_name} added!")
 
     # ---------- PLAYER LIST ----------
-    st.header("Players")
+    # ---------- PLAYER LIST ----------
+    with st.expander("Players"):
 
-    for idx, player in enumerate(st.session_state.players):
+        for idx, player in enumerate(st.session_state.players):
 
-        col1, col2 = st.columns([1,4])
+            col1, col2 = st.columns([1,3])
 
-        with col1:
-            zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
+            with col1:
+                zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
 
-        with col2:
-            st.markdown(
-                f"<div style='text-align:left; font-size:18px;'>{player['name']}</div>",
-                unsafe_allow_html=True
-            )
+            with col2:
+                st.write(player["name"])
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]

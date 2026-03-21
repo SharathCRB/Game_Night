@@ -215,7 +215,10 @@ with main_col:
         with col1:
             zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
         with col2:
-            st.write(player["name"])
+            st.markdown(
+                f"<div style='word-break: break-all;'>{player['name']}</div>",
+                unsafe_allow_html=True
+            )
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ---------- CREATE TEAM ----------

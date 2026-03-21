@@ -197,35 +197,20 @@ with main_col:
                 st.success(f"{player_name} added!")
 
     # ---------- PLAYER LIST ----------
+    st.header("Players")
+
     for idx, player in enumerate(st.session_state.players):
 
-        st.markdown(
-            f"""
-            <div style="
-                display:flex;
-                align-items:center;
-                gap:12px;
-                width:100%;
-            ">
-                <img src="data:image/png;base64,{player['photo']}"
-                style="
-                    width:70px;
-                    height:70px;
-                    border-radius:10px;
-                    object-fit:cover;
-                ">
+        col1, col2 = st.columns([1,4])
 
-                <div style="
-                    text-align:left;
-                    font-size:18px;
-                    flex:1;
-                ">
-                    {player["name"]}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        with col1:
+            zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
+
+        with col2:
+            st.markdown(
+                f"<div style='text-align:left; font-size:18px;'>{player['name']}</div>",
+                unsafe_allow_html=True
+            )
 
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]

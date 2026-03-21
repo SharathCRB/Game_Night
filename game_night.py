@@ -390,7 +390,7 @@ for idx, game in enumerate(st.session_state.games):
         f"""
 <div style="{style} padding:40px;border-radius:15px;color:white;max-width:900px;margin:auto;margin-bottom:25px;box-shadow:0px 8px 25px rgba(0,0,0,0.4);">
 
-<h1 style="color:{game['color']}; text-align:center;">
+<h1 style="color:{game['color']}; text-align:center; width:100%; margin:0 auto;">
 {game['name']}
 </h1>
 

@@ -197,37 +197,30 @@ with main_col:
                 st.success(f"{player_name} added!")
 
     # ---------- PLAYER LIST ----------
-    st.header("Players")
-
     for idx, player in enumerate(st.session_state.players):
-
-        img_html = f"""
-        <img src="data:image/png;base64,{player['photo']}"
-        style="
-            width:70px;
-            height:70px;
-            border-radius:10px;
-            object-fit:cover;
-            margin-right:10px;
-        ">
-        """
 
         st.markdown(
             f"""
             <div style="
                 display:flex;
                 align-items:center;
-                gap:10px;
-                max-width:100%;
-                overflow-x:hidden;
+                gap:12px;
+                width:100%;
             ">
-                {img_html}
+                <img src="data:image/png;base64,{player['photo']}"
+                style="
+                    width:70px;
+                    height:70px;
+                    border-radius:10px;
+                    object-fit:cover;
+                ">
+
                 <div style="
                     text-align:left;
                     font-size:18px;
-                    word-wrap:break-word;
+                    flex:1;
                 ">
-                    {player['name']}
+                    {player["name"]}
                 </div>
             </div>
             """,

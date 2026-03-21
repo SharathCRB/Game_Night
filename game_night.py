@@ -65,16 +65,23 @@ st.markdown("""
 <style>
 @media (max-width: 768px) {
 
+    /* Fix horizontal scroll issue */
+    section.main > div {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Fix columns behavior */
     .player-row div[data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
-        align-items: center;
-        justify-content: flex-start !important;
+        align-items: center !important;
     }
 
     .player-row div[data-testid="column"] {
-        flex: 1 1 auto !important;   /* 👈 balanced sizing */
-        min-width: 0 !important;     /* 👈 prevents overflow bug */
+        min-width: 0 !important;   /* 👈 KEY FIX */
+        flex: 1 1 0% !important;   /* 👈 prevents overflow */
     }
+
 }
 </style>
 """, unsafe_allow_html=True)

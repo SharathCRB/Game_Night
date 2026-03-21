@@ -479,14 +479,15 @@ position:fixed;
 top:0;
 left:0;
 width:100vw;
-height:100vh;
+height:100dvh;
 background:black;
-z-index:99999;
+z-index:999999;
 overflow:hidden;
 display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
+pointer-events:none;
 }}
 
 .title-text {{
@@ -499,7 +500,7 @@ animation: fadein 1s;
 .slider {{
 display:flex;
 gap:40px;
-animation: slide 5s linear forwards;
+animation: slide 10s linear forwards;
 }}
 
 .slide-img {{
@@ -516,7 +517,7 @@ border-radius:20px;
 position:absolute;
 height:300px;
 opacity:0;
-animation: showfinal 1s 5s forwards, zoomout 2s 6s forwards;
+animation: showfinal 1s 10s forwards, zoomout 2s 7s forwards;
 }}
 
 @keyframes showfinal {{
@@ -548,7 +549,7 @@ NEXT GAME IS
 
 <img src="data:image/jpg;base64,{final_img}" class="final-img">
 
-<audio autoplay>
+<audio autoplay muted>
 <source src="https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverwritten_Role_Playing_Game.mp3">
 </audio>
 

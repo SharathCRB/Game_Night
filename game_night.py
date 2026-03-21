@@ -65,23 +65,15 @@ st.markdown("""
 <style>
 @media (max-width: 768px) {
 
-    /* Prevent horizontal scrolling completely */
-    html, body, [data-testid="stAppViewContainer"] {
-        overflow-x: hidden !important;
-    }
-
     .player-row div[data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
         align-items: center;
         justify-content: flex-start !important;
-        width: 100% !important;          /* 👈 lock row width */
-        max-width: 100% !important;
     }
 
     .player-row div[data-testid="column"] {
-        flex: 0 0 auto !important;
-        width: auto !important;
-        max-width: 100% !important;
+        flex: 1 1 auto !important;   /* 👈 balanced sizing */
+        min-width: 0 !important;     /* 👈 prevents overflow bug */
     }
 }
 </style>

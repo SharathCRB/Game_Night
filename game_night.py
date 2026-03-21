@@ -212,19 +212,22 @@ with main_col:
                 st.success(f"{player_name} added!")
 
     # ---------- PLAYER LIST ----------
-    # ---------- PLAYER LIST ----------
     with st.expander("Players"):
 
-        for idx, player in enumerate(st.session_state.players):
+        players = st.session_state.players
 
-            col1, col2 = st.columns([1,3])
+        cols = st.columns(3)
 
-            with col1:
-                zoomable_image(player["photo"], size=70, uid=f"player_{idx}")
+        for i, player in enumerate(players):
 
-            with col2:
-                st.write(player["name"])
+            col = cols[i % 3]
 
+            with col:
+                zoomable_image(player["photo"], size=90, uid=f"player_{i}")
+                st.markdown(
+                    f"<p style='text-align:center'>{player['name']}</p>",
+                    unsafe_allow_html=True
+                )
     # ---------- CREATE TEAM ----------
     player_names = [p["name"] for p in st.session_state.players]
 
